@@ -11,21 +11,45 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
     
     - name: Set up Go
       uses: actions/setup-go@v5
       with:
         go-version: '1.25'
     
-    - name: Install dependencies
+    - name: Download dependencies
       run: go mod download
     
     - name: Run tests
       run: go test ./tests/... -v
     
-    - name: Build
+    - name: Build binary
       run: go build -v ./cmd/server
     
     - name: Build Docker image
-      run: docker build -t hookpeek .
+      run: docker build -t webhook-inspector .
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.25'
+    
+    - name: Run go fmt
+      run: |
+        if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
+          echo "Code is not formatted. Run 'go fmt ./...'"
+          gofmt -s -l .
+          exit 1
+        fi
+    
+    - name: Run go vet
+      run: go vet ./...
