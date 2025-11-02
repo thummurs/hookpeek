@@ -29,7 +29,7 @@ jobs:
       run: go build -v ./cmd/server
     
     - name: Build Docker image
-      run: docker build -t webhook-inspector .
+      run: docker build -t hookpeek .
 
   lint:
     runs-on: ubuntu-latest
